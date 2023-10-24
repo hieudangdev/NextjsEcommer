@@ -1,20 +1,22 @@
 /* eslint-disable @next/next/no-img-element */
 'use client';
-
 import Link from 'next/link';
 import { useState } from 'react';
 import { AiOutlineIdcard, AiOutlineLogin, AiOutlineShoppingCart } from 'react-icons/ai';
 import Searchbar from './Searchbar';
 import { BiMenu, BiUserPin } from 'react-icons/bi';
 import { CiSettings } from 'react-icons/ci';
-import Filter from './../../../Ecommerce-FullStack/app/filters/Filter';
+import Button from './ui/Button';
+import {signIn, signOut, useSession } from 'next-auth/react'
 
 type Props = {};
 
 const Navbar = (props: Props) => {
    const [showProfile, setshowProfile] = useState<boolean>(false);
-   const [User, setUser] = useState<boolean>(false);
    const [showNav, setshowNav] = useState<boolean>(false);
+   const {data:session} = useSession();
+
+
    return (
       <div>
          <div className='flex items-center justify-between  relative'>
@@ -37,7 +39,7 @@ const Navbar = (props: Props) => {
                         <a href='myproducts'>Products</a>
                      </li>
                   </ul>
-               </nav>   
+               </nav>
             </div>
             <div className='flex items-center space-x-4'>
                <Searchbar />
@@ -46,24 +48,25 @@ const Navbar = (props: Props) => {
                      <AiOutlineShoppingCart size={20} />
                   </Link>
                </div>
-               {User ? (
+               {session ? (
                   <div onClick={() => setshowProfile(!showProfile)} className='relative cursor-pointer'>
                      <img
                         src='https://github.com/shadcn.png'
                         alt='avatar'
                         className='w-[35px] h-[35px] object-cover rounded-full'
                      />
+                     
                      <div
                         className={`${
                            showProfile ? '' : 'hidden'
-                        } absolute z-50 min-w-[150px] mt-2 right-0 overflow-auto space-y-2 p-2 rounded-md border border-gray-600 bg-popover text-sm shadow-md `}
+                        } absolute z-50 bg-black min-w-[150px] mt-2 right-0 overflow-auto space-y-2 p-2 rounded-md border border-gray-600 bg-popover text-sm shadow-md `}
                      >
                         <Link
                            href='/sign'
                            className=' border-b flex border-gray-600 items-center  hover:bg-zinc-800 rounded-sm p-1 px-1 '
                         >
                            <BiUserPin size={18} className='mr-2' />
-                           Profile
+                           {session.user.name}
                         </Link>
                         <Link href='/sign' className=' flex  items-center hover:bg-zinc-800 rounded-sm p-1 px-1'>
                            <AiOutlineIdcard size={18} className='mr-2' />
@@ -73,28 +76,31 @@ const Navbar = (props: Props) => {
                            <CiSettings size={18} className='mr-2' />
                            Settings
                         </Link>
-                        <Link
-                           href='/sign'
-                           className=' flex border-gray-600 border-t items-center hover:bg-zinc-800 rounded-sm p-1 px-1'
+                        
+                        <button
+                           onClick={()=> signOut()}
+                           className=' flex border-gray-600  min-w-full border-t items-center hover:bg-zinc-800 rounded-sm p-1 px-1'
                         >
                            <AiOutlineLogin size={16} className='mr-2' />
                            Log out
-                        </Link>
+                        </button>
                      </div>
                   </div>
                ) : (
                   <div className='space-x-3'>
-                     <button className='border border-gray-500 px-2 py-1 rounded-md text-sm hover:opacity-70 opacity-1 shadow-sm '>
-                        <Link href='/'> Sign in </Link>
-                     </button>
-                    
+                     <Button onClick={()=> signIn()}>
+                         Sign in 
+                     </Button>
+                     {/* <Button onClick={()=>signUp()}>
+                        Sign up 
+                     </Button> */}
                   </div>
                )}
             </div>
          </div>
          <div className={`md:hidden ease-linear  transition-all ${showNav ? '' : 'h-0 invisible opacity-0'}`}>
             <ul className='flex flex-col text-md justify-center  '>
-               <li className=' border-t border-gray-500 py-2' >
+               <li className=' border-t border-gray-500 py-2'>
                   <a href='/shop' className='inline-block w-full text'>
                      Shop
                   </a>
